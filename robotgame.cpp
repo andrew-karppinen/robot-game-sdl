@@ -147,7 +147,7 @@ void DrawObjects(Object* obj_list,int size,SDL_Renderer* renderer)
 }
 
 
-int MoveLasers(Object* obj_list,int size,int points)
+int MoveLasers(Object* obj_list,int size,int score)
 {
 	/*
 	 move the lasers down, if the laser reaches the bottom,
@@ -161,12 +161,12 @@ int MoveLasers(Object* obj_list,int size,int points)
 		{
 
 			obj_list[i].PlaceObject(RandomNumber(0,640),-100*i); //place object up
-			points += 1;
+			score += 1;
 		}
 		
 		obj_list[i].MoveY(5); //move object to down
 	}
-	return points;
+	return score;
 
 }
 
@@ -226,7 +226,7 @@ int main(int argc, char *argv[]) //main function
 
 	//init variables
 	int running = 1;
-	int points = 0;
+	int score = 0;
 
 
 	bool move_left = false;
@@ -255,9 +255,13 @@ int main(int argc, char *argv[]) //main function
 
 	SDL_Color color = {255, 255, 255}; //text color
 	
+	//create "game over" text
 	SDL_Surface* gameovertext_surface = TTF_RenderText_Solid(font, "GAME OVER", color);
 	SDL_Texture* gameovertext_texture = SDL_CreateTextureFromSurface(renderer, gameovertext_surface);
-	SDL_Rect gameovertext_rect = {0, 0, 150, 30}; // Sijainti ja koko tekstille
+	SDL_Rect gameovertext_rect = {0, 0, 150, 35}; //text position and size
+	
+	
+	SDL_Rect score_text_rect = {350, 0, 150, 30}; //score text position and size
 
 	
 	
@@ -266,14 +270,13 @@ int main(int argc, char *argv[]) //main function
 
 
 		//create text:
-		string text = "Points: ";
-		string points_str  = to_string(points);
+		string text = "Score: ";
+		string points_str  = to_string(score);
 		text = text + points_str;
 		
 		//create text:
-		SDL_Surface* textSurface = TTF_RenderText_Solid(font, text.c_str(), color);
-		SDL_Texture* textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
-		SDL_Rect dstRect = {350, 0, 150, 30}; // Sijainti ja koko tekstille
+		SDL_Surface* score_text_surface = TTF_RenderText_Solid(font, text.c_str(), color);
+		SDL_Texture* score_text_texture = SDL_CreateTextureFromSurface(renderer, score_text_surface);
 
 
 
@@ -288,7 +291,7 @@ int main(int argc, char *argv[]) //main function
 			DrawObjects(obj_list,5,renderer); //draw objects
 
 			//draw text
-			SDL_RenderCopy(renderer, textTexture, nullptr, &dstRect);
+			SDL_RenderCopy(renderer, score_text_texture, nullptr, &score_text_rect);
 			SDL_RenderPresent(renderer); 
 
 		
@@ -296,7 +299,7 @@ int main(int argc, char *argv[]) //main function
 			SDL_UpdateWindowSurface( window );
 
 
-			points = MoveLasers(laser_list,4,points); //move lasers
+			score = MoveLasers(laser_list,4,score); //move lasers
 			
 			
 			
@@ -343,7 +346,7 @@ int main(int argc, char *argv[]) //main function
 			SDL_Delay(2000); //delay
 			RestartGame(&robot,laser_list,4);
 			gameover = false;
-			points = 0;
+			score = 0;
 		}
 	
 	
@@ -361,7 +364,9 @@ int main(int argc, char *argv[]) //main function
 					SDL_DestroyWindow(window);
 					IMG_Quit();
 					SDL_Quit();
-					SDL_FreeSurface(textSurface);
+					SDL_FreeSurface(score_text_surface);
+					SDL_FreeSurface(gameovertext_surface);
+
 					break;
 				}
 			
