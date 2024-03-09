@@ -6,7 +6,6 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_ttf.h>
-#include <stdbool.h>
 #include <random>
 #include <sstream>
 
@@ -140,7 +139,6 @@ void DrawObjects(Object* obj_list,int size,SDL_Renderer* renderer)
 	for (int i=0;i<size;i++)
 	{
 		SDL_RenderCopy(renderer, obj_list[i].image_, nullptr, obj_list[i].rect_);
-		SDL_RenderPresent(renderer); // image
 	}
 	
 	
@@ -225,7 +223,7 @@ int main(int argc, char *argv[]) //main function
     laser_texture = SDL_CreateTextureFromSurface(renderer, laser_surface); //create texture
 
 	//init variables
-	int running = 1;
+	bool running = true;
 	int score = 0;
 
 
@@ -265,7 +263,7 @@ int main(int argc, char *argv[]) //main function
 
 	
 	
-	while (running) { //main loop	
+	while (running) { //main loop
 		frameStart = SDL_GetTicks();
 
 
@@ -292,17 +290,12 @@ int main(int argc, char *argv[]) //main function
 
 			//draw text
 			SDL_RenderCopy(renderer, score_text_texture, nullptr, &score_text_rect);
-			SDL_RenderPresent(renderer); 
 
-		
-			//Update the surface
-			SDL_UpdateWindowSurface( window );
-
+			SDL_RenderPresent(renderer); //Update the surface
 
 			score = MoveLasers(laser_list,4,score); //move lasers
-			
-			
-			
+
+
 			//collision check
 			for(int i=0;i<4;i++)
 			{
@@ -357,7 +350,7 @@ int main(int argc, char *argv[]) //main function
 
 				if (event.type == SDL_QUIT) //if window close
 				{
-					running = 0;
+					running = false;
 					//close sdl:
 					SDL_DestroyTexture(robot_texture);
 					SDL_DestroyRenderer(renderer);
